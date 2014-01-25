@@ -1,0 +1,208 @@
+isomon Documentation
+====================
+Castedo Ellerman <castedo@castedo.com>
+
+Overview
+--------
+
+Structure
+~~~~~~~~~
+
+The `isomon` library has a low-level C interface which provide safe simple
+access to ISO currency data. See the Reference or currency.h if you are
+only interested in accessing ISO currency data from C.
+
+For those programming in `C++` the `isomon::currency` class provides
+essentially the same service as the low-level C interface but in the
+friendly and type-safe interface of a C++ class.
+
+For quantities of money you can us `isomon::money` which depends on
+`isomon::currency`. But if you only need to represent world currencies 
+then you can use only `isomon::currency` without any dependecy on
+the `isomon::money` class.
+
+
+Purpose
+~~~~~~~
+
+Quantities of money are more than just numbers. Money today is usually
+denominated in a government backed currency and has a smallest unit for
+_concrete_ transactions. Most currencies have a smallest unit which is smaller
+than one, which create special challenges when using the most popular data
+representation for fractional numbers: binary floating-point, in particular the
+`C` type _double_.
+
+The +isomon+ classes provide a efficient high-level and type-safe
+representation of the real-world constructs of currency and quantities of
+money. They are value types which have comparable time and space performance to
+the built-in types of `C`.
+
+
+Currency Library
+----------------
+
+.Features
+* single header file option
+* no 3rd party dependencies
+* fast access to data from ISO 4217 currency code tables
+* exception throwing optional
+* cross-platform
+* alternative lower-level C functions
+
+
+Class currency
+~~~~~~~~~~~~~~
+
+The easiest way to use the +isomon::currency+ class is to copy this
+single unified header:
+link:isomon_currency.hpp[isomon_currency.hpp].
+
+If you want to edit the files or build unit or performance tests,
+you should make a clone of the
+link:http://code.google.com/p/isomon/[isomon source code repository]
+using a Mercurial client.
+
+
+
+
+.Example Values of isomon::currency
+[monospaced, options="header"]
+|=====
+| str() | isonum() | num_minors() | Comments
+
+| "XXX" | 999 | 0 | ISO 4217 "No currency" code; default value.
+
+| "EUR" | 978 | 100 | Euros
+
+| "USD" | 840 | 100 | US Dollars
+
+| "JPY" | 392 | 1 | Japanese Yen
+
+| "XAU" | 959 | 0 | Gold
+
+| "XFU" | 0 | 0 | settlement currency of the International Union of Railways
+
+|=====
+
+Although most currencies have a number of minor units, some do not
+and thus return +0+ from method +num_minors()+. Notably this is the case
+for the special ``currency'' XXX which stands for ``no currency''.
+
+The ISO 4217 standard specifies that ``Nil'' is the ``numeric'' code of XFU, a
+settlement currency of the International Union of Railways. The isomon library
+maps this to the integer +0+.
+
+
+[pass]
++++++++++++
+<xi:include href="reference.xml"
+  xpointer="xpointer(/section/section[1])"
+  xmlns:xi="http://www.w3.org/2001/XInclude"/>
++++++++++++
+
+
+Low-level C functions
+~~~~~~~~~~~~~~~~~~~~~
+
+For C99 programmers or C++ programmers who want to implement their own currency
+class, the low-level C function interface provide access to all the ISO 4217
+data and almost all the functionality of the +isomon::currency+ class (which is
+a thin type-safe wrapper around these C functions).
+
+[pass]
++++++++++++
+<xi:include href="reference.xml"
+  xpointer="xpointer(/section/section[2])"
+  xmlns:xi="http://www.w3.org/2001/XInclude"/>
++++++++++++
+
+
+
+Other Currency Classes
+~~~~~~~~~~~~~~~~~~~~~~
+* link:http://sourceforge.net/projects/ccy/[ccy C++ library]
+* Currency class in link:http://code.google.com/p/nmoneys/[nmoneys for .NET]
+* Currency class in Java
+* Currency classes in link:http://quantlib.org[QuantLib]
+* RWCurrency in Money.h++ by RogueWave software (commercial)
+
+Acknowledgements
+~~~~~~~~~~~~~~~~~
+
+* to Remi Chateauneu, author of the
+link:http://sourceforge.net/projects/ccy/[ccy library], for valuable comments and discussion
+* to link:http://www.designomotion.com/[Designomotion] for a more attractive logo
+
+
+Money Library
+-------------
+
+[quote]
+___________________________________________________________________
+isomon::money = IEEE 754 double - exponent + ISO 4217 currency code
+___________________________________________________________________
+
+.Features
+* usage required only header files and no 3rd party dependencies
+* data from ISO 4217 currency code tables
+* space and time performance like +C double+
+* round trips numerically with IEEE 754 double representation
+* binary representation can be persisted
+* binary in-memory transient representation fits in 64 bits
+* cross-platform
+* fixed-point per ISO currency, floating-point across currencies
+* smallest epsilon is smallest unit of cash of currency
+* no implicit rounding
+* has dimension of currency, run-time unit, for compile time sub-class a decimal type
+* no exception throwing
+
+
+The easiest way to use the +isomon::money+ and +isomon::money_calc+ classes
+is to copy this single unified header:
+link:isomon_money.hpp[isomon_money.hpp].
+
+If you want to edit the files or build unit or performance tests,
+you should make a clone of the
+link:http://code.google.com/p/isomon/[isomon source code repository]
+using a Mercurial client.
+
+
+
+isomon::money
+~~~~~~~~~~~~~~
+
+[pass]
++++++++++++
+<xi:include href="reference.xml"
+  xpointer="xpointer(/section/section[3])"
+  xmlns:xi="http://www.w3.org/2001/XInclude"/>
++++++++++++
+
+
+isomon::money_calc
+~~~~~~~~~~~~~~~~~~
+
+[pass]
++++++++++++
+<xi:include href="reference.xml"
+  xpointer="xpointer(/section/section[4])"
+  xmlns:xi="http://www.w3.org/2001/XInclude"/>
++++++++++++
+
+
+Other Money (or Decimal) Classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* The Money class in link:http://www.martinfowler.com/books.html#eaai[
+  "Patterns of Enterprise Application Architecture" by Martin Fowler]
+* link:http://code.google.com/p/nmoneys/[nmoneys for .NET]
+* link:http://www.codeproject.com/KB/recipes/MoneyTypeForCLR.aspx[A Money type for the CLR]
+* link:http://software.intel.com/en-us/articles/intel-decimal-floating-point-math-library/[
+  Intel Decimal Floating-Point Math Library]
+* https://github.com/vpiotr/decimal_for_cpp
+* link:http://www.di-mare.com/adolfo/p/money.htm[Yet Another C++ Money Class]
+* link:http://www.idinews.com/sourcecode/MoneyCPP.html[
+  C++ Money type from IDI Software Component Library]
+* Money.h++ by RogueWave software (commercial)
+* CComCurrency class from Microsoft ATL
+
+
