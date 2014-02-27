@@ -155,6 +155,11 @@ inline money & money::operator -= (money rhs) {
   return *this += -rhs;
 }
 
+inline money money::operator - () {
+  money ret(0, this->unit());
+  return ret -= *this;
+}
+
 inline money money::operator + (money rhs) {
   money ret = *this;
   return ret += rhs;
