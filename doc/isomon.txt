@@ -59,10 +59,9 @@ link:isomon_currency.hpp[isomon_currency.hpp].
 
 If you want to edit the files or build unit or performance tests,
 you should make a clone of the
-link:http://code.google.com/p/isomon/[isomon source code repository]
-using a Mercurial client.
-
-
+link:http://github.com/castedo/isomon[git source code repository]
+or 
+link:http://code.google.com/p/isomon/[Mercurial source code repository].
 
 
 .Example Values of isomon::currency
@@ -163,9 +162,9 @@ link:isomon_money.hpp[isomon_money.hpp].
 
 If you want to edit the files or build unit or performance tests,
 you should make a clone of the
-link:http://code.google.com/p/isomon/[isomon source code repository]
-using a Mercurial client.
-
+link:http://github.com/castedo/isomon[git source code repository]
+or 
+link:http://code.google.com/p/isomon/[Mercurial source code repository].
 
 
 isomon::money
