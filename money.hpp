@@ -21,6 +21,7 @@ public:
 
   static money pos_infinity(currency unit);
   static money neg_infinity(currency unit);
+  static money epsilon(currency unit);
 
   double value() const;
   currency unit() const;
@@ -28,9 +29,11 @@ public:
 
   money & operator += (money rhs);
   money & operator -= (money rhs);
-  money operator - ();
-  money operator + (money rhs);
-  money operator - (money rhs);
+  money & operator *= (int rhs);
+  money operator - () const;
+  money operator + (money rhs) const;
+  money operator - (money rhs) const;
+  money operator * (int rhs) const;
 
   bool operator == (money rhs) const { return _data == rhs._data; }
   bool operator != (money rhs) const { return _data != rhs._data; }
@@ -46,6 +49,8 @@ private:
   int64_t _data;
 };
 
+inline bool isfinite(money m) { return std::isfinite(m.value()); }
+
 // Construction from floating point numbers
 
 template <class _Number>
@@ -58,11 +63,15 @@ template <class _Number>
 money money_trunc(_Number value, currency unit);
 
 template <class _Number>
-money money_roundhalfout(_Number value, currency unit);
+money round(_Number value, currency unit);
 
 template <class _Number>
-money money_roundhalfeven(_Number value, currency unit);
+money rounde(_Number value, currency unit);
 
+
+// More operators
+
+inline money operator * (int i, money m) { return m * i; }
 
 inline std::ostream & operator << (std::ostream & os, money m)
 {
@@ -146,8 +155,8 @@ inline void money::init(int64_t minors, currency unit) {
   if (unit.num_minors() < 1) {
     _data = ISO_XXX;
   } else {
-  _data = std::max( detail::NEG_INF_MINORS,
-                    std::min(detail::POS_INF_MINORS, minors) );
+    _data = std::max( detail::NEG_INF_MINORS,
+                      std::min(detail::POS_INF_MINORS, minors) );
     _data <<= 10;
     _data |= 0x3FF & unit.isonum();
   }
@@ -175,6 +184,14 @@ inline money money::neg_infinity(currency unit) {
   money ret;
   if (unit.num_minors() > 0) {
     ret._data = unit.isonum() | (detail::NEG_INF_MINORS << 10);
+  }
+  return ret;
+}
+
+inline money money::epsilon(currency unit) {
+  money ret;
+  if (unit.num_minors() > 0) {
+    ret._data = (1 << 10) | (0x3FF & unit.isonum());
   }
   return ret;
 }
@@ -221,22 +238,37 @@ inline money & money::operator -= (money rhs) {
     if (neg_if_overflow < 0) fix_overflow();
   }
   return *this;
-  return *this += -rhs;
+  //TODO implement more sane minus operator
+  // return *this += -rhs;
 }
 
-inline money money::operator - () {
+inline money & money::operator *= (int rhs) {
+  int64_t minors = rhs * this->total_minors();
+  //TODO detect all multiplication overflows
+  minors = std::max( detail::NEG_INF_MINORS,
+                     std::min(detail::POS_INF_MINORS, minors) );
+  _data = (minors << 10) | (0x3FF & _data);
+  return *this;
+}
+
+inline money money::operator - () const {
   money ret(0, this->unit());
   return ret -= *this;
 }
 
-inline money money::operator + (money rhs) {
+inline money money::operator + (money rhs) const {
   money ret = *this;
   return ret += rhs;
 }
 
-inline money money::operator - (money rhs) {
+inline money money::operator - (money rhs) const {
   money ret = *this;
   return ret -= rhs;
+}
+
+inline money money::operator * (int rhs) const {
+  money ret = *this;
+  return ret *= rhs;
 }
 
 inline void money::fix_overflow()
@@ -278,14 +310,14 @@ money money_trunc(_Number value, currency unit)
 }
 
 template <class _Number>
-money money_roundhalfout(_Number value, currency unit)
+money round(_Number value, currency unit)
 {
   typedef number_traits<_Number> nt;
   return detail::money_cast(value, unit, nt::roundhalfout);
 }
 
 template <class _Number>
-money money_roundhalfeven(_Number value, currency unit)
+money rounde(_Number value, currency unit)
 {
   typedef number_traits<_Number> nt;
   return detail::money_cast(value, unit, nt::roundhalfeven);

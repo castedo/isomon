@@ -7,16 +7,70 @@ namespace isomon {
 
 
 template <class _Number>
-struct money_calc {
-  _Number minors;
+struct money_calc {};
+
+template <>
+struct money_calc<double>
+{
+  double minors;
   currency unit;
 
-  money_calc( _Number m, currency u) : minors(m), unit(u) {}
+  money_calc() : minors(NAN) {}
+  money_calc(double m, currency u) : minors(m), unit(u) {}
+  money_calc(money m) : minors(m.total_minors()), unit(m.unit()) {}
+
+  double value() const {
+    return minors / unit.num_minors();
+  }
+
+  #if __cplusplus >= 201103L
+  explicit operator double const () {
+    return minors / unit.num_minors();
+  }
+  #endif
+
+  money_calc & operator += (money_calc const& rhs) {
+    if (this->unit == rhs.unit) {
+      this->minors += rhs.minors;
+    } else {
+       minors = NAN;
+       unit = ISO_XXX;
+    }
+    return *this;
+  }
+
+  money_calc operator + (money_calc const& rhs) const {
+    money_calc ret(*this);
+    ret += rhs;
+    return ret;
+  }
+
+  money_calc & operator *= (double x) {
+    this->minors *= x;
+    return *this;
+  }
+
+  bool operator > (money m) const {
+    return minors > m.total_minors() && unit == m.unit();
+  }
+
+  bool operator <= (money m) const {
+    return minors <= m.total_minors() && unit == m.unit();
+  }
+
+  //TODO: add more operators
 };
 
-template <class _Number>
-money_calc<_Number> operator * (money a, _Number b) {
-  return money_calc<_Number>(a.total_minors() * b, a.unit());
+inline bool isfinite(money_calc<double> const& mc) { 
+  return std::isfinite(mc.minors);
+}
+
+inline money_calc<double> operator * (money a, double b) {
+  return money_calc<double>(a.total_minors() * b, a.unit());
+}
+
+inline money_calc<double> operator * (double x, money m) {
+  return m * x;
 }
 
 template <class _Number>
