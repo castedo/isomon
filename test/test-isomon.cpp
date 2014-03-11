@@ -1,13 +1,10 @@
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_NO_MAIN
+#include <boost/test/unit_test.hpp>
 
 #include "test-currency.hpp"
 #include "test-money.hpp"
-#include "test-money_calc.hpp"
 
 #include <iostream>
 #include <string>
-#include <boost/test/unit_test.hpp>
 
 using namespace std;
 using namespace boost;
@@ -32,7 +29,7 @@ void add_test_cases(T (&cases)[sz], char const* test_name)
 
 #define ADD_TEST_CASES(test_cases) add_test_cases(test_cases, #test_cases)
 
-bool init_unit_test()
+boost::unit_test::test_suite* init_unit_test_suite(int, char* [])
 {
   // test-currency.hpp
   ADD_TEST_CASES(invalid_cases);
@@ -45,11 +42,6 @@ bool init_unit_test()
   ADD_TEST_CASES(no_currency_cases);     
   ADD_TEST_CASES(int_round_trip_cases);     
 
-  return true;
-}
-
-int main(int argc, char* argv[])
-{
-  return unit_test::unit_test_main(&init_unit_test, argc, argv);
+  return 0;
 }
 
