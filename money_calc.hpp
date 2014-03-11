@@ -3,12 +3,8 @@
 
 #include "money.hpp"
 
-#include <tr1/cmath>
-
 namespace isomon {
 
-template <class _Number>
-struct number_traits {};
 
 template <class _Number>
 struct money_calc {
@@ -45,35 +41,6 @@ money roundhalfout(money_calc<_Number> const& mc) {
   return money(0, nt::roundhalfout(mc.minors), mc.unit); 
 }
 
-template<>
-struct number_traits<double>
-{
-  static bool isnan(double x) { return std::isnan(x); }
-
-  static bool isinf(double x) { return std::isinf(x); }
-
-  static int64_t floor(double x) { return std::floor(x); }
-
-  static int64_t ceil(double x) { return std::ceil(x); }
-
-  static int64_t trunc(double x) { return std::tr1::trunc(x); }
-
-  static int64_t roundhalfout(double x) { return std::tr1::round(x); }
-
-  // round half (towards) even, "banker's rounding"
-  static int64_t roundhalfeven(double x) {
-    int64_t halfout = roundhalfout(x);
-    if (halfout % 2) { // if odd, might need to adjust
-      if (x * 2 + 1 == double(2.0 * halfout)) {
-        // x is exactly halfway between two integers
-        // and was rounded OUT (away from zero) to an odd number
-        // we want to round IN (toward zero) to an even number instead
-        return (halfout < 0 ? halfout + 1 : halfout - 1);
-      }
-    }
-    return halfout;
-  }
-};
 
 } // namespace
 

@@ -7,6 +7,7 @@
 #include <ostream>
 #include <iomanip>
 #include <locale>
+#include <tr1/cmath>
 
 namespace isomon {
 
@@ -45,6 +46,23 @@ private:
   int64_t _data;
 };
 
+// Construction from floating point numbers
+
+template <class _Number>
+money money_floor(_Number value, currency unit);
+
+template <class _Number>
+money money_ceil(_Number value, currency unit);
+
+template <class _Number>
+money money_trunc(_Number value, currency unit);
+
+template <class _Number>
+money money_roundhalfout(_Number value, currency unit);
+
+template <class _Number>
+money money_roundhalfeven(_Number value, currency unit);
+
 
 inline std::ostream & operator << (std::ostream & os, money m)
 {
@@ -63,6 +81,44 @@ inline std::ostream & operator << (std::ostream & os, money m)
 }
 
 
+/// Number traits
+
+template <class _Number>
+struct number_traits {};
+
+// number traits are pre-defined for type double
+// define similar struct in isomon namespace for other float types
+
+template<>
+struct number_traits<double>
+{
+  static bool isnan(double x) { return std::isnan(x); }
+
+  static bool isinf(double x) { return std::isinf(x); }
+
+  static int64_t floor(double x) { return std::floor(x); }
+
+  static int64_t ceil(double x) { return std::ceil(x); }
+
+  static int64_t trunc(double x) { return std::tr1::trunc(x); }
+
+  static int64_t roundhalfout(double x) { return std::tr1::round(x); }
+
+  // round half (towards) even, "banker's rounding"
+  static int64_t roundhalfeven(double x) {
+    int64_t halfout = roundhalfout(x);
+    if (halfout % 2) { // if odd, might need to adjust
+      if (x * 2 + 1 == double(2.0 * halfout)) {
+        // x is exactly halfway between two integers
+        // and was rounded OUT (away from zero) to an odd number
+        // we want to round IN (toward zero) to an even number instead
+        return (halfout < 0 ? halfout + 1 : halfout - 1);
+      }
+    }
+    return halfout;
+  }
+};
+
 /////////////////////////////////////////////////////////////////////
 
 namespace detail {
@@ -70,6 +126,19 @@ namespace detail {
 const int64_t CURRENCY_BITS = 0x3ffLL; // low 10 bits
 const int64_t POS_INF_MINORS = (1LL << 53) - 1; // 2^53 - 1
 const int64_t NEG_INF_MINORS = -(POS_INF_MINORS + 1); // - 2^53
+
+template <class _Number>
+money money_cast(_Number value, currency unit, int64_t (*rounder)(_Number) )
+{
+  typedef number_traits<_Number> nt;
+  if (nt::isnan(value) || unit.num_minors() < 1) return money();
+  if (nt::isinf(value)) {
+    if (value > 0) return money::pos_infinity(unit);
+    else return money::neg_infinity(unit);
+  }
+  _Number minors = unit.num_minors() * value;
+  return money(0, rounder(minors), unit); 
+}
 
 } // namespace isomon::detail
 
@@ -188,6 +257,38 @@ inline money nextafter(money m)
     ret._data |= (detail::POS_INF_MINORS << 10);
   }
   return ret;
+}
+
+template <class _Number>
+money money_floor(_Number value, currency unit)
+{
+  return detail::money_cast(value, unit, number_traits<_Number>::floor);
+}
+
+template <class _Number>
+money money_ceil(_Number value, currency unit)
+{
+  return detail::money_cast(value, unit, number_traits<_Number>::ceil);
+}
+
+template <class _Number>
+money money_trunc(_Number value, currency unit)
+{
+  return detail::money_cast(value, unit, number_traits<_Number>::trunc);
+}
+
+template <class _Number>
+money money_roundhalfout(_Number value, currency unit)
+{
+  typedef number_traits<_Number> nt;
+  return detail::money_cast(value, unit, nt::roundhalfout);
+}
+
+template <class _Number>
+money money_roundhalfeven(_Number value, currency unit)
+{
+  typedef number_traits<_Number> nt;
+  return detail::money_cast(value, unit, nt::roundhalfeven);
 }
 
 
