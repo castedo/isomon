@@ -25,6 +25,22 @@ struct money_calc<double>
   explicit operator double const () { return this->value(); }
   #endif
 
+  money_calc & operator += (money_calc const& rhs) {
+    if (this->unit == rhs.unit) {
+      this->minors += rhs.minors;
+    } else {
+       minors = NAN;
+       unit = ISO_XXX;
+    }
+    return *this;
+  }
+
+  money_calc operator + (money_calc const& rhs) const {
+    money_calc ret(*this);
+    ret += rhs;
+    return ret;
+  }
+
   money_calc & operator *= (double rhs) {
     this->minors *= rhs;
     return *this;

@@ -46,6 +46,8 @@ private:
   int64_t _data;
 };
 
+inline bool isfinite(money m) { return std::isfinite(m.value()); }
+
 // Construction from floating point numbers
 
 template <class _Number>
@@ -58,10 +60,10 @@ template <class _Number>
 money money_trunc(_Number value, currency unit);
 
 template <class _Number>
-money money_roundhalfout(_Number value, currency unit);
+money round(_Number value, currency unit);
 
 template <class _Number>
-money money_roundhalfeven(_Number value, currency unit);
+money rounde(_Number value, currency unit);
 
 
 inline std::ostream & operator << (std::ostream & os, money m)
