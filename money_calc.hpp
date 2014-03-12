@@ -91,7 +91,7 @@ money trunc(money_calc<_Number> const& mc) {
 }
 
 template <class _Number>
-money roundhalfout(money_calc<_Number> const& mc) {
+money round(money_calc<_Number> const& mc) {
   typedef number_traits<_Number> nt;
   if (nt::isnan(mc.minors) || mc.unit.num_minors() < 1) return money();
   if (nt::isinf(mc.minors)) {

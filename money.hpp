@@ -117,12 +117,11 @@ struct number_traits<double>
   static int64_t roundhalfeven(double x) {
     int64_t halfout = roundhalfout(x);
     if (halfout % 2) { // if odd, might need to adjust
-      if (x * 2 + 1 == double(2.0 * halfout)) {
-        // x is exactly halfway between two integers
-        // and was rounded OUT (away from zero) to an odd number
-        // we want to round IN (toward zero) to an even number instead
-        return (halfout < 0 ? halfout + 1 : halfout - 1);
-      }
+      // x is exactly halfway between two integers
+      // and was rounded OUT (away from zero) to an odd number
+      // we want to round IN (toward zero) to an even number instead
+      if (halfout - x == 0.5) return halfout - 1;
+      if (halfout - x == -0.5) return halfout + 1;
     }
     return halfout;
   }
@@ -280,19 +279,19 @@ inline money nextafter(money m)
 }
 
 template <class _Number>
-money money_floor(_Number value, currency unit)
+money floor(_Number value, currency unit)
 {
   return detail::money_cast(value, unit, number_traits<_Number>::floor);
 }
 
 template <class _Number>
-money money_ceil(_Number value, currency unit)
+money ceil(_Number value, currency unit)
 {
   return detail::money_cast(value, unit, number_traits<_Number>::ceil);
 }
 
 template <class _Number>
-money money_trunc(_Number value, currency unit)
+money trunc(_Number value, currency unit)
 {
   return detail::money_cast(value, unit, number_traits<_Number>::trunc);
 }
