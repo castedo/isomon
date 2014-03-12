@@ -21,7 +21,6 @@ public:
 
   static money pos_infinity(currency unit);
   static money neg_infinity(currency unit);
-  static money epsilon(currency unit);
 
   double value() const;
   currency unit() const;
@@ -183,14 +182,6 @@ inline money money::neg_infinity(currency unit) {
   money ret;
   if (unit.num_minors() > 0) {
     ret._data = unit.isonum() | (detail::NEG_INF_MINORS << 10);
-  }
-  return ret;
-}
-
-inline money money::epsilon(currency unit) {
-  money ret;
-  if (unit.num_minors() > 0) {
-    ret._data = (1 << 10) | (0x3FF & unit.isonum());
   }
   return ret;
 }
