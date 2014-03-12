@@ -228,18 +228,7 @@ inline money & money::operator += (money rhs) {
 }
 
 inline money & money::operator -= (money rhs) {
-  int64_t diff_bits = (_data ^ rhs._data);
-  if (detail::CURRENCY_BITS & diff_bits) {
-    _data = ISO_XXX;
-  } else {
-    _data -= ~detail::CURRENCY_BITS & rhs._data;
-    int64_t neg_if_sign_changed = (_data ^ rhs._data);
-    int64_t neg_if_overflow = neg_if_sign_changed & ~diff_bits;
-    if (neg_if_overflow < 0) fix_overflow();
-  }
-  return *this;
-  //TODO implement more sane minus operator
-  // return *this += -rhs;
+  return *this += -rhs;
 }
 
 inline money & money::operator *= (int rhs) {
@@ -252,17 +241,16 @@ inline money & money::operator *= (int rhs) {
 }
 
 inline money money::operator - () const {
-  money ret(0, this->unit());
-  return ret -= *this;
+  return money(0, -this->total_minors(), this->unit());
 }
 
 inline money money::operator + (money rhs) const {
-  money ret = *this;
+  money ret(*this);
   return ret += rhs;
 }
 
 inline money money::operator - (money rhs) const {
-  money ret = *this;
+  money ret(*this);
   return ret -= rhs;
 }
 
