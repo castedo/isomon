@@ -67,7 +67,6 @@ money round(_Number value, currency unit);
 template <class _Number>
 money rounde(_Number value, currency unit);
 
-
 // More operators
 
 inline money operator * (int i, money m) { return m * i; }
