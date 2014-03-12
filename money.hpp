@@ -146,8 +146,8 @@ inline void money::init(int64_t minors, currency unit) {
   if (unit.num_minors() < 1) {
     _data = ISO_XXX;
   } else {
-  _data = std::max( detail::NEG_INF_MINORS,
-                    std::min(detail::POS_INF_MINORS, minors) );
+    _data = std::max( detail::NEG_INF_MINORS,
+                      std::min(detail::POS_INF_MINORS, minors) );
     _data <<= 10;
     _data |= 0x3FF & unit.isonum();
   }
@@ -211,31 +211,20 @@ inline money & money::operator += (money rhs) {
 }
 
 inline money & money::operator -= (money rhs) {
-  int64_t diff_bits = (_data ^ rhs._data);
-  if (detail::CURRENCY_BITS & diff_bits) {
-    _data = ISO_XXX;
-  } else {
-    _data -= ~detail::CURRENCY_BITS & rhs._data;
-    int64_t neg_if_sign_changed = (_data ^ rhs._data);
-    int64_t neg_if_overflow = neg_if_sign_changed & ~diff_bits;
-    if (neg_if_overflow < 0) fix_overflow();
-  }
-  return *this;
   return *this += -rhs;
 }
 
 inline money money::operator - () {
-  money ret(0, this->unit());
-  return ret -= *this;
+  return money(0, -this->total_minors(), this->unit());
 }
 
 inline money money::operator + (money rhs) {
-  money ret = *this;
+  money ret(*this);
   return ret += rhs;
 }
 
 inline money money::operator - (money rhs) {
-  money ret = *this;
+  money ret(*this);
   return ret -= rhs;
 }
 

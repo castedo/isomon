@@ -48,6 +48,18 @@ struct int_round_trip {
   {(1LL << 46), "USD"}, {(1LL << 53) - 2, "JPY"} 
 };
 
+BOOST_AUTO_TEST_CASE( near_zero_subtraction_test )
+{
+  money cent(0, 1, "USD");
+  money zero(0, 0, "USD");
+
+  BOOST_CHECK_EQUAL( cent - cent, zero );
+  BOOST_CHECK_EQUAL( -cent + cent, zero );
+  BOOST_CHECK_CLOSE( cent.value(), 0.01, 1e-6);
+  BOOST_CHECK_CLOSE( (-cent).value(), -0.01, 1e-6);
+  BOOST_CHECK_EQUAL( zero - cent, -cent);
+}
+
 BOOST_AUTO_TEST_CASE( output_test )
 {
   money m(2.0, "USD");
