@@ -92,5 +92,44 @@ BOOST_AUTO_TEST_CASE( output_test )
   BOOST_CHECK_EQUAL(ss.str(), "EUR 2.00");
 }
 
+BOOST_AUTO_TEST_CASE( rounding_test )
+{
+  money zero(0, 0, "USD");
+  money cent(0, 1, "USD");
+  money two(0, 2, "USD");
+  money three(0, 3, "USD");
+
+  BOOST_CHECK_EQUAL( cent, round(0.005, "USD") );
+  BOOST_CHECK_EQUAL( zero, rounde(0.005, "USD") );
+  BOOST_CHECK_EQUAL( two, round(0.015, "USD") );
+  BOOST_CHECK_EQUAL( two, rounde(0.015, "USD") );
+  BOOST_CHECK_EQUAL( three, round(0.025, "USD") );
+  BOOST_CHECK_EQUAL( two, rounde(0.025, "USD") );
+
+  BOOST_CHECK_EQUAL( -cent, round(-0.005, "USD") );
+  BOOST_CHECK_EQUAL( zero, rounde(-0.005, "USD") );
+  BOOST_CHECK_EQUAL( -two, round(-0.015, "USD") );
+  BOOST_CHECK_EQUAL( -two, rounde(-0.015, "USD") );
+  BOOST_CHECK_EQUAL( -three, round(-0.025, "USD") );
+  BOOST_CHECK_EQUAL( -two, rounde(-0.025, "USD") );
+}
+
+BOOST_AUTO_TEST_CASE( six_fifths_rounding_test )
+{
+  double not_really_two = (1.2 - 1) * 10;
+
+  BOOST_CHECK( not_really_two < 2 );
+  BOOST_CHECK_EQUAL( not_really_two, 0x1.FFFFFFFFFFFFEp+0 );
+
+  money two(2, 0, "USD");
+  money one_99(1, 99, "USD");
+
+  BOOST_CHECK_EQUAL( two, round(not_really_two, "USD") );
+  BOOST_CHECK_EQUAL( two, rounde(not_really_two, "USD") );
+  BOOST_CHECK_EQUAL( two, ceil(not_really_two, "USD") );
+  BOOST_CHECK_EQUAL( one_99, trunc(not_really_two, "USD") );
+  BOOST_CHECK_EQUAL( one_99, floor(not_really_two, "USD") );
+}
+
 #endif
 

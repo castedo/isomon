@@ -15,13 +15,13 @@ BOOST_AUTO_TEST_CASE( roundhalfout_test )
 {
   money m(2.0, "USD");
 
-  m = roundhalfout(m * 1.5);
+  m = round(m * 1.5);
   BOOST_CHECK_EQUAL(m.total_minors(), 300);
 
-  money m2 = roundhalfout(m * 1.001);
+  money m2 = round(m * 1.001);
   BOOST_CHECK_EQUAL(m2.total_minors(), 300);
 
-  m2 = roundhalfout(m * 1.002);
+  m2 = round(m * 1.002);
   BOOST_CHECK_EQUAL(m2.total_minors(), 301);
 }
 
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE( multiply_test )
   money m(3, 0, "USD");
   money_calc<double> mc(1.5, "USD");
 
-  BOOST_CHECK_EQUAL( roundhalfout(m * 2), roundhalfout(mc * 4) );
+  BOOST_CHECK_EQUAL( round(m * 2), round(mc * 4) );
 }
 
 
