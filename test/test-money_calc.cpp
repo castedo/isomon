@@ -25,5 +25,14 @@ BOOST_AUTO_TEST_CASE( roundhalfout_test )
   BOOST_CHECK_EQUAL(m2.total_minors(), 301);
 }
 
+BOOST_AUTO_TEST_CASE( multiply_test )
+{
+  money m(3, 0, "USD");
+  money_calc<double> mc(1.5, "USD");
+
+  BOOST_CHECK_EQUAL( roundhalfout(m * 2), roundhalfout(mc * 4) );
+}
+
+
 #endif
 
