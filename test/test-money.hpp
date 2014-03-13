@@ -54,11 +54,8 @@ BOOST_AUTO_TEST_CASE( integer_multipy_test )
   money cent(0, 1, "USD");
   money two_cent(0, 2, "USD");
 
-  BOOST_CHECK_EQUAL( two_cent, 2 * cent );
   BOOST_CHECK_EQUAL( two_cent, cent * 2 );
-  BOOST_CHECK_EQUAL( zero, 0 * cent );
   BOOST_CHECK_EQUAL( zero, cent * 0 );
-  BOOST_CHECK_EQUAL( -two_cent, -2 * cent );
   BOOST_CHECK_EQUAL( -two_cent, cent * -2 );
 }
 
@@ -96,10 +93,10 @@ BOOST_AUTO_TEST_CASE( big_integer_multipy_test )
 
   BOOST_CHECK( isfinite(i_want) );
   BOOST_CHECK( !isfinite(too_much) );
-  BOOST_CHECK( !isfinite(2 * i_want) );
-  BOOST_CHECK( !isfinite(-2 * i_want) );
-  BOOST_CHECK( (2 * i_want).value() > 0 );
-  BOOST_CHECK( (-2 * i_want).value() < 0 );
+  BOOST_CHECK( !isfinite(i_want * 2) );
+  BOOST_CHECK( !isfinite(i_want * -2) );
+  BOOST_CHECK( (i_want * 2).value() > 0 );
+  BOOST_CHECK( (i_want * -2).value() < 0 );
   BOOST_CHECK( !isfinite(i_want * (1 << 31)) );
   BOOST_CHECK( !isfinite(i_want * (-1 << 31)) );
 }

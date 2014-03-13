@@ -61,13 +61,13 @@ inline bool isfinite(money m) { return std::isfinite(m.value()); }
 // Construction from floating point numbers
 
 template <class _Number>
-money money_floor(_Number value, currency unit);
+money floor(_Number value, currency unit);
 
 template <class _Number>
-money money_ceil(_Number value, currency unit);
+money ceil(_Number value, currency unit);
 
 template <class _Number>
-money money_trunc(_Number value, currency unit);
+money trunc(_Number value, currency unit);
 
 template <class _Number>
 money round(_Number value, currency unit);
@@ -75,9 +75,6 @@ money round(_Number value, currency unit);
 template <class _Number>
 money rounde(_Number value, currency unit);
 
-// More operators
-
-inline money operator * (int32_t i, money m) { return m * i; }
 
 inline std::ostream & operator << (std::ostream & os, money m)
 {

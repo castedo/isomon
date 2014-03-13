@@ -70,10 +70,10 @@ struct money_calc<double>
   bool operator <= (money m) const { return *this <= money_calc(m); }
 };
 
-bool operator > (money m, money_calc<double> const& mc) { return mc < m; }
-bool operator >= (money m, money_calc<double> const& mc) { return mc <= m; }
-bool operator < (money m, money_calc<double> const& mc) { return mc > m; }
-bool operator <= (money m, money_calc<double> const& mc) { return mc >= m; }
+inline bool operator > (money m, money_calc<double> mc) { return mc < m; } 
+inline bool operator >= (money m, money_calc<double> mc) { return mc <= m; }
+inline bool operator < (money m, money_calc<double> mc) { return mc > m; }
+inline bool operator <= (money m, money_calc<double> mc) { return mc >= m; }
 
 inline bool isfinite(money_calc<double> const& mc) { 
   return std::isfinite(mc.minors);
