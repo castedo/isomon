@@ -28,11 +28,11 @@ public:
 
   money & operator += (money rhs);
   money & operator -= (money rhs);
-  money & operator *= (int rhs);
+  money & operator *= (int32_t rhs);
   money operator - () const;
   money operator + (money rhs) const;
   money operator - (money rhs) const;
-  money operator * (int rhs) const;
+  money operator * (int32_t rhs) const;
 
   bool operator == (money rhs) const { return _data == rhs._data; }
   bool operator != (money rhs) const { return _data != rhs._data; }
@@ -69,7 +69,7 @@ money rounde(_Number value, currency unit);
 
 // More operators
 
-inline money operator * (int i, money m) { return m * i; }
+inline money operator * (int32_t i, money m) { return m * i; }
 
 inline std::ostream & operator << (std::ostream & os, money m)
 {
@@ -146,6 +146,17 @@ money money_cast(_Number value, currency unit, int64_t (*rounder)(_Number) )
   return money(0, rounder(minors), unit); 
 }
 
+inline
+std::pair<int64_t, uint32_t> safe_multiply(int64_t a, int32_t b)
+// returns ret == pair( a*b >> 32, a*b & 2^32 - 1 ) without overflows
+// where (a*b == ret.first << 32 + ret.second) in 96 bit math
+{
+  int64_t hi = (a >> 32) * b;
+  int64_t lo = (a & 0xFFFFFFFF) * b;
+  hi += (lo >> 32);
+  return std::pair<int64_t, uint32_t>(hi, lo & 0xFFFFFFFF);
+}
+
 } // namespace isomon::detail
 
 inline void money::init(int64_t minors, currency unit) {
@@ -220,9 +231,16 @@ inline money & money::operator -= (money rhs) {
   return *this += -rhs;
 }
 
-inline money & money::operator *= (int rhs) {
-  int64_t minors = rhs * this->total_minors();
-  //TODO detect all multiplication overflows
+inline money & money::operator *= (int32_t rhs) {
+  std::pair<int64_t, uint32_t> p = detail::safe_multiply(total_minors(), rhs);
+  int64_t minors;
+  if (p.first < -(1LL << 31)) {
+    minors = detail::NEG_INF_MINORS;
+  } else if (p.first >= (1LL << 31)) {
+    minors = detail::POS_INF_MINORS;
+  } else {
+    minors = (p.first << 32) + p.second;
+  }
   minors = std::max( detail::NEG_INF_MINORS,
                      std::min(detail::POS_INF_MINORS, minors) );
   _data = (minors << 10) | (0x3FF & _data);

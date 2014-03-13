@@ -48,6 +48,64 @@ struct int_round_trip {
   {(1LL << 46), "USD"}, {(1LL << 53) - 2, "JPY"} 
 };
 
+BOOST_AUTO_TEST_CASE( integer_multipy_test )
+{
+  money zero(0, 0, "USD");
+  money cent(0, 1, "USD");
+  money two_cent(0, 2, "USD");
+
+  BOOST_CHECK_EQUAL( two_cent, 2 * cent );
+  BOOST_CHECK_EQUAL( two_cent, cent * 2 );
+  BOOST_CHECK_EQUAL( zero, 0 * cent );
+  BOOST_CHECK_EQUAL( zero, cent * 0 );
+  BOOST_CHECK_EQUAL( -two_cent, -2 * cent );
+  BOOST_CHECK_EQUAL( -two_cent, cent * -2 );
+}
+
+void check_safe_multiply(int64_t a, int32_t b,
+                         int64_t expect_hi, uint32_t expect_lo)
+{
+  pair<int64_t, uint32_t> got = isomon::detail::safe_multiply(a, b);
+  BOOST_CHECK_EQUAL( expect_hi, got.first ); 
+  BOOST_CHECK_EQUAL( expect_lo, got.second ); 
+}
+
+BOOST_AUTO_TEST_CASE( safe_multiply_test )
+{
+  int64_t max64 = numeric_limits<int64_t>::max();
+  int64_t min64 = numeric_limits<int64_t>::min();
+  int64_t max32 = numeric_limits<int32_t>::max();
+  int64_t min32 = numeric_limits<int32_t>::min();
+  check_safe_multiply(0, 0, 0, 0);
+  check_safe_multiply(1, 1, 0, 1);
+  check_safe_multiply(-1, -1, 0, 1);
+  check_safe_multiply(1, -1, -1, uint32_t(-1));
+  check_safe_multiply(-1, 1, -1, uint32_t(-1));
+  check_safe_multiply(min64, min32, 1LL << 62, 0);
+  check_safe_multiply(min64, max32, -(1LL << 62) + (1LL << 31), 0);
+  check_safe_multiply(max64, min32, -(1LL << 62), 1LL << 31);
+  check_safe_multiply(max64, max32, (1LL<<62) - (1LL<<31) - 1, (1LL<<31) + 1);
+}
+
+BOOST_AUTO_TEST_CASE( big_integer_multipy_test )
+{
+  int64_t mucho = 1;
+  mucho <<= 52;
+  money i_want(0, mucho, "USD");
+  money too_much(0, 2*mucho, "USD");
+
+  BOOST_CHECK( isfinite(i_want) );
+  BOOST_CHECK( !isfinite(too_much) );
+  BOOST_CHECK( !isfinite(2 * i_want) );
+  BOOST_CHECK( !isfinite(-2 * i_want) );
+  BOOST_CHECK( (2 * i_want).value() > 0 );
+  BOOST_CHECK( (-2 * i_want).value() < 0 );
+  BOOST_CHECK( !isfinite(i_want * (1 << 31)) );
+  BOOST_CHECK( !isfinite(i_want * (-1 << 31)) );
+
+  BOOST_CHECK( !isfinite(i_want * mucho) );
+}
+
 BOOST_AUTO_TEST_CASE( near_zero_subtraction_test )
 {
   money cent(0, 1, "USD");

@@ -31,10 +31,10 @@ public:
   currency(int16_t i) : num_(data::is_isonum(i) ? i : ISO_XXX) {}
 
   /// True if this is not special ISO "no currency" value "XXX" (999)
-  bool is_currency() { return num_ != ISO_XXX; }
+  bool is_currency() const { return num_ != ISO_XXX; }
 
   /// True if this is special ISO "no currency" value "XXX" (999)
-  bool is_no_currency() { return num_ == ISO_XXX; }
+  bool is_no_currency() const { return num_ == ISO_XXX; }
 
   /// return ISO 3-character code
   std::string str() const { return std::string(data::isonum2code(num_)); }
