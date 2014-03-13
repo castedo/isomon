@@ -43,6 +43,14 @@ private:
   #ifndef DOXYGEN_SHOULD_SKIP_THIS
   void init(int64_t minors, currency unit);
   void fix_overflow();
+
+  // don't interger multiply by anything other than int32_t
+  money & operator *= (uint32_t rhs);
+  money operator * (uint32_t rhs) const;
+  money & operator *= (int64_t rhs);
+  money operator * (int64_t rhs) const;
+  money & operator *= (uint64_t rhs);
+  money operator * (uint64_t rhs) const;
   #endif
 
   int64_t _data;
@@ -152,9 +160,9 @@ std::pair<int64_t, uint32_t> safe_multiply(int64_t a, int32_t b)
 // where (a*b == ret.first << 32 + ret.second) in 96 bit math
 {
   int64_t hi = (a >> 32) * b;
-  int64_t lo = (a & 0xFFFFFFFF) * b;
+  int64_t lo = (a & 0xFFFFFFFFLL) * b;
   hi += (lo >> 32);
-  return std::pair<int64_t, uint32_t>(hi, lo & 0xFFFFFFFF);
+  return std::pair<int64_t, uint32_t>(hi, lo & 0xFFFFFFFFLL);
 }
 
 } // namespace isomon::detail

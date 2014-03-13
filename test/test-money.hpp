@@ -102,8 +102,6 @@ BOOST_AUTO_TEST_CASE( big_integer_multipy_test )
   BOOST_CHECK( (-2 * i_want).value() < 0 );
   BOOST_CHECK( !isfinite(i_want * (1 << 31)) );
   BOOST_CHECK( !isfinite(i_want * (-1 << 31)) );
-
-  BOOST_CHECK( !isfinite(i_want * mucho) );
 }
 
 BOOST_AUTO_TEST_CASE( near_zero_subtraction_test )
