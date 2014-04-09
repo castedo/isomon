@@ -139,15 +139,14 @@ const int64_t POS_INF_MINORS = (1LL << 53) - 1; // 2^53 - 1
 const int64_t NEG_INF_MINORS = -(POS_INF_MINORS + 1); // - 2^53
 
 template <class _Number>
-money money_cast(_Number value, currency unit, int64_t (*rounder)(_Number) )
+money money_cast(_Number minors, currency unit, int64_t (*rounder)(_Number) )
 {
   typedef number_traits<_Number> nt;
-  if (nt::isnan(value) || unit.num_minors() < 1) return money();
-  if (nt::isinf(value)) {
-    if (value > 0) return money::pos_infinity(unit);
+  if (nt::isnan(minors) || unit.num_minors() < 1) return money();
+  if (nt::isinf(minors)) {
+    if (minors > 0) return money::pos_infinity(unit);
     else return money::neg_infinity(unit);
   }
-  _Number minors = unit.num_minors() * value;
   return money(0, rounder(minors), unit); 
 }
 
@@ -294,33 +293,38 @@ inline money nextafter(money m)
 template <class _Number>
 money floor(_Number value, currency unit)
 {
-  return detail::money_cast(value, unit, number_traits<_Number>::floor);
+  _Number minors = value * unit.num_minors();
+  return detail::money_cast(minors, unit, number_traits<_Number>::floor);
 }
 
 template <class _Number>
 money ceil(_Number value, currency unit)
 {
-  return detail::money_cast(value, unit, number_traits<_Number>::ceil);
+  _Number minors = value * unit.num_minors();
+  return detail::money_cast(minors, unit, number_traits<_Number>::ceil);
 }
 
 template <class _Number>
 money trunc(_Number value, currency unit)
 {
-  return detail::money_cast(value, unit, number_traits<_Number>::trunc);
+  _Number minors = value * unit.num_minors();
+  return detail::money_cast(minors, unit, number_traits<_Number>::trunc);
 }
 
 template <class _Number>
 money round(_Number value, currency unit)
 {
   typedef number_traits<_Number> nt;
-  return detail::money_cast(value, unit, nt::roundhalfout);
+  _Number minors = value * unit.num_minors();
+  return detail::money_cast(minors, unit, nt::roundhalfout);
 }
 
 template <class _Number>
 money rounde(_Number value, currency unit)
 {
   typedef number_traits<_Number> nt;
-  return detail::money_cast(value, unit, nt::roundhalfeven);
+  _Number minors = value * unit.num_minors();
+  return detail::money_cast(minors, unit, nt::roundhalfeven);
 }
 
 
