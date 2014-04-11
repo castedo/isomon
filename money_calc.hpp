@@ -58,7 +58,7 @@ struct money_calc<double>
     return ret;
   }
 
-  inline money_calc<double> operator + (money rhs) {
+  money_calc operator + (money rhs) {
     money_calc ret(*this);
     ret += rhs;
     return ret;
@@ -70,7 +70,11 @@ struct money_calc<double>
     return ret;
   }
 
-  money_calc operator - () const { return money_calc(-minors, unit); }
+  money_calc operator - () const {
+    money_calc ret(*this);
+    ret.minors = -ret.minors;
+    return ret;
+  }
 
   money_calc & operator -= (double rhs) { return *this += -rhs; }
   money_calc & operator -= (money rhs) { return *this += -rhs; }
@@ -126,6 +130,14 @@ inline bool operator <= (money m, money_calc<double> mc) { return mc >= m; }
 
 inline bool isfinite(money_calc<double> const& mc) { 
   return std::isfinite(mc.minors);
+}
+
+inline money_calc<double> operator + (money m, double x) {
+  return money_calc<double>(m) + x;
+}
+
+inline money_calc<double> operator + (double x, money m) {
+  return m + x;
 }
 
 inline money_calc<double> operator + (money m, money_calc<double> mc) {

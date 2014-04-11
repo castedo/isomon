@@ -36,13 +36,26 @@ BOOST_AUTO_TEST_CASE( multiply_test )
 BOOST_AUTO_TEST_CASE( addition_test )
 {
   money_calc<double> one_third_dollar( 1.0/3.0, "USD" );
-  money thirty_three_cents(0, 33, "USD");
   money buck(1, 0, "USD");
 
   BOOST_CHECK_EQUAL( buck, round(3 * one_third_dollar) );
   money_calc<double> sum = one_third_dollar + one_third_dollar;
   sum += one_third_dollar;
   BOOST_CHECK_EQUAL( buck, round(sum) );
+}
+
+BOOST_AUTO_TEST_CASE( negation_test )
+{
+  money thirty_three_cents(0, 33, "USD");
+  money neg_thirty_three_cents(0, -33, "USD");
+  money buck(1, 0, "USD");
+  money_calc<double> one_third_dollar( 1.0/3.0, "USD" );
+  money_calc<double> neg_one_third_dollar( -1.0/3.0, "USD" );
+
+  BOOST_CHECK_EQUAL( -thirty_three_cents, neg_thirty_three_cents );
+  BOOST_CHECK_EQUAL( buck - thirty_three_cents, money(0, 67, "USD") );
+  BOOST_CHECK_EQUAL( -buck + thirty_three_cents, -money(0, 67, "USD") );
+  BOOST_CHECK_EQUAL( round(-one_third_dollar), round(neg_one_third_dollar) );
 }
 
 BOOST_AUTO_TEST_CASE( mutlicurrency_nonaddition_test )
