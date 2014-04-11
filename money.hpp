@@ -16,7 +16,6 @@ class money
 {
 public:
   money();
-  money(int64_t value, currency unit);
   money(int64_t major_units, int64_t minor_units, currency unit);
 
   static money pos_infinity(currency unit);
@@ -175,10 +174,6 @@ inline void money::init(int64_t minors, currency unit) {
 }
 
 inline money::money() : _data(ISO_XXX) {}
-
-inline money::money(int64_t value, currency unit) {
-  init( value * unit.num_minors(), unit );
-}
 
 inline money::money(int64_t majors, int64_t minors, currency unit) {
   init( majors * unit.num_minors() + minors, unit );

@@ -13,7 +13,7 @@ using namespace isomon;
 
 BOOST_AUTO_TEST_CASE( roundhalfout_test )
 {
-  money m(2.0, "USD");
+  money m(2, 0, "USD");
 
   m = round(m * 1.5);
   BOOST_CHECK_EQUAL(m.total_minors(), 300);

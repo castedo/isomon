@@ -13,18 +13,17 @@ using namespace boost::unit_test;
 using namespace isomon;
 
 struct no_currency {
-  double v;
   const char* code;
 
-  string name() { return lexical_cast<string>(v) + code; }
+  string name() { return code; }
   void test() {
-    money m(v, code);
+    money m(0, 0, code);
     BOOST_CHECK_EQUAL( m.unit().c_str(), "XXX" );
     BOOST_CHECK_EQUAL( m.unit().str(), "XXX" );
     BOOST_CHECK( m.value() != m.value() );
   }
 } no_currency_cases[] = {
-  {0, "AAA"}, {0, "XXX"}, {0, "ZZZ"}, {0, "___"}, {0, "$"}, {0, "$$$"}
+  {"AAA"}, {"XXX"}, {"ZZZ"}, {"___"}, {"$"}, {"$$$"}
 };
 
 struct int_round_trip {
@@ -33,12 +32,12 @@ struct int_round_trip {
 
   string name() { return lexical_cast<string>(i) + code; }
   void test() {
-    money m(i, code);
+    money m(i, 0, code);
     BOOST_CHECK_EQUAL( m.value(), i );
     BOOST_CHECK_EQUAL( m.unit().c_str(), code );
     BOOST_CHECK_EQUAL( m.unit().str(), code );
 
-    money m2(m.value(), m.unit());
+    money m2(m.value(), 0, m.unit());
     BOOST_CHECK_EQUAL( m2.value(), i );
     BOOST_CHECK_EQUAL( m2.unit().c_str(), code );
     BOOST_CHECK_EQUAL( m2.unit().str(), code );
@@ -115,7 +114,7 @@ BOOST_AUTO_TEST_CASE( near_zero_subtraction_test )
 
 BOOST_AUTO_TEST_CASE( output_test )
 {
-  money m(2.0, "USD");
+  money m(2, 0, "USD");
   stringstream ss;
 
   ss.imbue(locale::classic());
@@ -127,13 +126,13 @@ BOOST_AUTO_TEST_CASE( output_test )
   ss << m;
   BOOST_CHECK_EQUAL(ss.str(), "2,00 USD");
 
-  money yen(2, "JPY");
+  money yen(2, 0, "JPY");
   ss.str("");
   ss.imbue(locale("de_DE"));
   ss << yen;
   BOOST_CHECK_EQUAL(ss.str(), "2 JPY");
 
-  money euro(2, "EUR");
+  money euro(2, 0, "EUR");
   ss.str("");
   ss.imbue(locale("en_IE"));
   ss << euro;
