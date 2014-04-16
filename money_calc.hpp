@@ -140,8 +140,28 @@ inline money_calc<double> operator + (double x, money m) {
   return m + x;
 }
 
+inline money_calc<double> operator + (double x, money_calc<double> mc) {
+  return mc + x;
+}
+
 inline money_calc<double> operator + (money m, money_calc<double> mc) {
   return mc + m;
+}
+
+inline money_calc<double> operator - (money m, double x) {
+  return m + (-x);
+}
+
+inline money_calc<double> operator - (double x, money m) {
+  return x + (-m);
+}
+
+inline money_calc<double> operator - (double x, money_calc<double> mc) {
+  return x + (-mc);
+}
+
+inline money_calc<double> operator - (money m, money_calc<double> mc) {
+  return m + (-mc);
 }
 
 inline money_calc<double> operator * (money m, double x) {
