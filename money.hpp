@@ -57,6 +57,8 @@ private:
 
 inline bool isfinite(money m) { return std::isfinite(m.value()); }
 
+inline money operator * (int32_t i, money m) { return m * i; }
+
 // Construction from floating point numbers
 
 template <class _Number>
