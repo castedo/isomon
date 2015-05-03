@@ -93,6 +93,20 @@ inline std::ostream & operator << (std::ostream & os, money m)
   return os;
 }
 
+// round half (towards) even, "banker's rounding"
+
+inline long int llrounde(double x)
+{
+  int64_t halfout = std::llround(x);
+  if (halfout % 2) { // if odd, might need to adjust
+    // x is exactly halfway between two integers
+    // and was rounded OUT (away from zero) to an odd number
+    // we want to round IN (toward zero) to an even number instead
+    if (halfout - x == 0.5) return halfout - 1;
+    if (halfout - x == -0.5) return halfout + 1;
+  }
+  return halfout;
+}
 
 /// Number traits
 
@@ -115,20 +129,9 @@ struct number_traits<double>
 
   static int64_t trunc(double x) { return std::tr1::trunc(x); }
 
-  static int64_t roundhalfout(double x) { return std::tr1::round(x); }
+  static int64_t roundhalfout(double x) { return std::llround(x); }
 
-  // round half (towards) even, "banker's rounding"
-  static int64_t roundhalfeven(double x) {
-    int64_t halfout = roundhalfout(x);
-    if (halfout % 2) { // if odd, might need to adjust
-      // x is exactly halfway between two integers
-      // and was rounded OUT (away from zero) to an odd number
-      // we want to round IN (toward zero) to an even number instead
-      if (halfout - x == 0.5) return halfout - 1;
-      if (halfout - x == -0.5) return halfout + 1;
-    }
-    return halfout;
-  }
+  static int64_t roundhalfeven(double x) { return llrounde(x); }
 };
 
 /////////////////////////////////////////////////////////////////////
